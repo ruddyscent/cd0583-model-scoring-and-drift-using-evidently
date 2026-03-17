@@ -55,7 +55,7 @@ def build_datasets(raw_data: pd.DataFrame):
     current[prediction] = model.predict(current[feature_columns])
 
     regression_definition = DataDefinition(
-        numerical_columns=numerical_features,
+        numerical_columns=numerical_features + [target, prediction],
         categorical_columns=categorical_features,
         regression=[Regression(target=target, prediction=prediction)],
     )
@@ -89,19 +89,19 @@ def make_slice(dataset: Dataset, start: str, end: str) -> Dataset:
 def save_regression_reports(reference_dataset: Dataset, current_dataset: Dataset) -> None:
     report = Report([RegressionPreset()])
 
-    result = report.run(reference_data=reference_dataset, current_data=None)
+    result = report.run(current_data=reference_dataset, reference_data=None)
     result.save_html(str(STATIC_DIR / "index.html"))
 
     week1 = make_slice(current_dataset, "2011-01-29 00:00:00", "2011-02-07 23:00:00")
-    result = report.run(reference_data=reference_dataset, current_data=week1)
+    result = report.run(current_data=week1, reference_data=reference_dataset)
     result.save_html(str(STATIC_DIR / "regression_performance_after_week1.html"))
 
     week2 = make_slice(current_dataset, "2011-02-08 00:00:00", "2011-02-14 23:00:00")
-    result = report.run(reference_data=reference_dataset, current_data=week2)
+    result = report.run(current_data=week2, reference_data=reference_dataset)
     result.save_html(str(STATIC_DIR / "regression_performance_after_week2.html"))
 
     week3 = make_slice(current_dataset, "2011-02-15 00:00:00", "2011-02-21 23:00:00")
-    result = report.run(reference_data=reference_dataset, current_data=week3)
+    result = report.run(current_data=week3, reference_data=reference_dataset)
     result.save_html(str(STATIC_DIR / "regression_performance_after_week3.html"))
 
 
